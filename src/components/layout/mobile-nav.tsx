@@ -24,7 +24,7 @@ export function MobileNav() {
     <Dialog.Root>
       <Dialog.Trigger
         aria-label="Open menu"
-        className="inline-flex size-10 items-center justify-center rounded-xl text-foreground outline-none transition-colors hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-accent/45 md:hidden"
+        className="inline-flex size-10 items-center justify-center rounded-xl text-foreground outline-none transition-colors hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-accent md:hidden"
       >
         <Menu className="size-5" />
       </Dialog.Trigger>
@@ -39,7 +39,7 @@ export function MobileNav() {
             </Dialog.Title>
             <Dialog.Close
               aria-label="Close menu"
-              className="inline-flex size-10 items-center justify-center rounded-xl text-foreground outline-none transition-colors hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-accent/45"
+              className="inline-flex size-10 items-center justify-center rounded-xl text-foreground outline-none transition-colors hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-accent"
             >
               <X className="size-5" />
             </Dialog.Close>
@@ -51,7 +51,7 @@ export function MobileNav() {
                 key={link.href}
                 render={<a href={link.href} />}
                 nativeButton={false}
-                className="rounded-xl px-3 py-3 text-base font-medium text-foreground outline-none transition-colors hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-accent/45"
+                className="rounded-xl px-3 py-3 text-base font-medium text-foreground outline-none transition-colors hover:bg-foreground/[0.04] focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {link.label}
               </Dialog.Close>

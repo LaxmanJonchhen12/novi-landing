@@ -18,7 +18,7 @@ export function SiteHeader() {
         <a
           href="#top"
           aria-label="Novi, back to top"
-          className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent/45"
+          className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <Logo />
         </a>
@@ -29,7 +29,7 @@ export function SiteHeader() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="rounded-lg px-3 py-2 text-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent/45"
+                  className="rounded-lg px-3 py-2 text-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   {link.label}
                 </a>

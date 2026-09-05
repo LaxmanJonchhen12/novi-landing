@@ -46,7 +46,7 @@ export function SiteFooter() {
                     <li key={link.label}>
                       <a
                         href={link.href}
-                        className="rounded text-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent/45"
+                        className="rounded text-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
                       >
                         {link.label}
                       </a>
@@ -70,7 +70,7 @@ export function SiteFooter() {
                     <a
                       href={social.href}
                       aria-label={social.label}
-                      className="grid size-9 place-items-center rounded-lg text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent/45"
+                      className="grid size-9 place-items-center rounded-lg text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       <Icon className="size-4" />
                     </a>
@@ -84,7 +84,7 @@ export function SiteFooter() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="rounded text-xs text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent/45"
+                    className="rounded text-xs text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     {link.label}
                   </a>

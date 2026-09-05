@@ -38,7 +38,7 @@ export function SubscribeForm() {
           placeholder={newsletter.placeholder}
           aria-invalid={state.status === "error" || undefined}
           aria-describedby="subscribe-status"
-          className="h-11 min-w-0 flex-1 rounded-xl border border-border bg-background px-3.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/45 aria-invalid:border-red-500"
+          className="h-11 min-w-0 flex-1 rounded-xl border border-border bg-background px-3.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent aria-invalid:border-red-500"
         />
         <Button type="submit" disabled={isPending} className="shrink-0">
           {isPending ? "Subscribing…" : newsletter.buttonLabel}

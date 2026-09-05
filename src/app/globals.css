@@ -10,13 +10,20 @@
  *
  * No dark-mode variant on purpose: the brief specs one calm, light
  * surface, not a theme that shifts with the OS.
+ *
+ * Two values are tuned for WCAG AA rather than picked by eye:
+ *   --accent was #2596BE, which gave only 3.19:1 for its own label text on a
+ *     button and for small accent text — both need 4.5:1. Darkened along the
+ *     same hue to #1E7B9C, which reaches 4.52:1 in both cases.
+ *   --muted-foreground was 60%, which landed at 4.47:1 — just under AA. 65%
+ *     gives 5.28:1, and the visual difference is barely perceptible.
  */
 :root {
   --background: #f8f8f5;
   --foreground: #181a1b;
-  --muted-foreground: color-mix(in srgb, var(--foreground) 60%, transparent);
+  --muted-foreground: color-mix(in srgb, var(--foreground) 65%, transparent);
 
-  --accent: #2596be;
+  --accent: #1e7b9c;
   --accent-foreground: #f8f8f5;
 
   --border: color-mix(in srgb, var(--foreground) 12%, transparent);
