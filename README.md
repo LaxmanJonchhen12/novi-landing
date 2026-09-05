@@ -6,7 +6,7 @@ fast-moving teams.
 Built by [Laxman Jonchhen](https://github.com/LaxmanJonchhen12) as a frontend
 assessment.
 
-**Live preview:** _connecting deployment — link to follow_
+**Live preview:** https://novi-landing-neon.vercel.app/
 
 ---
 
