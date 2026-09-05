@@ -1,9 +1,11 @@
 import { board } from "@/content/board";
 import { Container } from "@/components/ui/container";
 
+import { Board } from "./board";
+
 /**
- * Placeholder frame for the hero's product visual. Step 4 replaces the empty
- * body with the real columns and cards, and gives them motion.
+ * The window-chrome frame around the board. Kept separate from `Board` itself
+ * so the "browser toolbar" look isn't tangled up with the columns/cards logic.
  */
 export function BoardPreview() {
   return (
@@ -21,9 +23,7 @@ export function BoardPreview() {
           <span aria-hidden className="w-[52px]" />
         </div>
 
-        <div className="grid min-h-[18rem] place-items-center p-6">
-          <p className="text-sm text-muted-foreground">Board — built in Step 4</p>
-        </div>
+        <Board />
       </div>
     </Container>
   );

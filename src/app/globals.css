@@ -80,3 +80,16 @@ body {
     transform: none;
   }
 }
+
+/* Active card's status dot — a slow opacity breathe, not a border pulse. A
+   pulsing border reads as an alert in most UI conventions; this reads as
+   "still live" instead. Global prefers-reduced-motion rule above caps this
+   to effectively one frame. */
+@keyframes breathe {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
