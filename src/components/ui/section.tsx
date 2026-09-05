@@ -23,7 +23,12 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className={cn("py-12 md:py-24", className)}>
+    // Top padding ONLY. If every section padded both sides, two adjacent
+    // sections would each pay for the same gap and it would come out double
+    // the spacing used everywhere else (measured: 180px between sections vs
+    // 94px between the board and the first section). One direction keeps the
+    // rhythm uniform. The footer owns the bottom of the page.
+    <section id={id} className={cn("pt-12 md:pt-24", className)}>
       <Container>
         <div className="mx-auto flex max-w-[46ch] flex-col items-center text-center">
           <h2
