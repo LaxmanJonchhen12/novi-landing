@@ -8,6 +8,8 @@ assessment.
 
 **Live preview:** https://novi-landing-neon.vercel.app/
 
+Design and engineering rationale is in **[DECISIONS.md](DECISIONS.md)**.
+
 ---
 
 ## Quick start
@@ -33,55 +35,69 @@ Open <http://localhost:3000>.
 
 ---
 
+## Lighthouse
+
+Measured against `pnpm build && pnpm start`, not the dev server.
+
+| | Performance | Accessibility | Best Practices | SEO |
+|---|---|---|---|---|
+| Desktop | **100** | **100** | **100** | **100** |
+| Mobile (throttled) | **99** | **100** | **100** | **100** |
+
+Cumulative Layout Shift **0** and Total Blocking Time **0 ms** on both.
+
+---
+
 ## Stack
 
 | Choice | Why |
 |---|---|
-| **Next.js 16** (App Router) | Server Components by default — the static parts of a landing page ship no JavaScript. `"use client"` is used only on the interactive leaves. |
-| **TypeScript** | Page content is typed data rather than hardcoded JSX, so content and presentation stay separate. |
-| **Tailwind CSS v4** | CSS-first config. The design system lives in `globals.css` as CSS variables — one source of truth, no `tailwind.config.js` needed. |
-| **Geist** via `next/font` | Self-hosted at build time. No external font request, no layout shift on load. |
-| **CSS animations** (no animation library) | The page needs entrance choreography and scroll reveals, not physics or gestures. A ~34kB animation library would be the wrong trade; CSS keyframes plus a small `IntersectionObserver` hook ship zero extra JS. |
+| **Next.js 16** (App Router) | Server Components by default. Only four components ship JavaScript: the header's scroll observer, the mobile menu, the scroll-reveal wrapper, and the signup form. |
+| **TypeScript** | All page copy is typed data in `src/content/`, so content and presentation stay separate and a missing field fails the build. |
+| **Tailwind CSS v4** | CSS-first config. The design system lives in `globals.css` as CSS variables — one source of truth, no `tailwind.config.js`. |
+| **Base UI** | Used directly for the mobile menu dialog (focus trap, Escape, scroll lock). See DECISIONS.md for why not shadcn/ui. |
+| **Geist** via `next/font` | Self-hosted at build. No external font request, no layout shift. |
+| **No animation library** | Entrance choreography and scroll reveals are CSS keyframes plus a ~30-line `IntersectionObserver` hook. A ~34kB library would have been the wrong trade. |
 
 ---
 
 ## Design system
 
-Defined once in [`src/app/globals.css`](src/app/globals.css) and consumed
-everywhere through Tailwind utilities, so no component hardcodes a hex value.
+Defined once in [`src/app/globals.css`](src/app/globals.css) and consumed through
+Tailwind utilities, so no component hardcodes a colour.
 
 | Token | Value | Used for |
 |---|---|---|
 | `--background` | `#F8F8F5` | Page surface |
 | `--foreground` | `#181A1B` | Primary text |
-| `--muted-foreground` | `--foreground` @ 60% | Subheads, labels |
-| `--accent` | `#2596BE` | Primary action, emphasis |
+| `--muted-foreground` | `--foreground` @ 65% | Subheads, labels |
+| `--accent` | `#1E7B9C` | Primary action, emphasis |
 | `--border` | `--foreground` @ 12% | Thin 1px rules |
 | `--radius` | `0.75rem` | Corner radius throughout |
 
-Variables use shadcn/ui's naming convention so the component library can be
-added later without rewriting the token layer.
+Variables use shadcn/ui's naming convention so that library could be added later
+without rewriting the token layer.
 
-The visual direction is deliberately calm — generous whitespace, thin borders,
-a single accent, no gradients or heavy shadows. Novi's own pitch is a workspace
-that stays out of the way, and the page is meant to argue that by looking like
-it.
+The visual direction is deliberately calm — generous whitespace, thin borders, a
+single accent, no gradients or heavy shadows. Novi's own pitch is a workspace
+that stays out of the way, and the page argues that by looking like it.
 
-**There is no dark mode, on purpose.** The brief specifies one calm surface;
-a theme that shifts with the OS would work against that.
+**There is no dark mode, on purpose** — see DECISIONS.md.
 
 ---
 
 ## Responsiveness
 
-Verified at each step across the full range, not just at a mobile and a desktop
-breakpoint:
+Verified at every step across the full range, not just at one mobile and one
+desktop breakpoint:
 
-`320px` · `390px` · `430px` · `768px` · `1024px` · `1440px` · `1920px` · `2560px`
+`320` · `375` · `430` · `768` · `1024` · `1440` · `1920` · `2560`
 
-Type scales fluidly with `clamp()` rather than jumping at breakpoints, and
-content is width-capped so it stays readable on large monitors while the
-background remains full-bleed.
+- Type scales with `clamp()` rather than jumping at breakpoints.
+- Content is width-capped at `80rem` so it stays readable on large monitors
+  while the background remains full-bleed.
+- The hero board becomes a horizontal snap-scroll carousel below `768px`
+  rather than stacking three columns vertically.
 
 ---
 
@@ -90,16 +106,29 @@ background remains full-bleed.
 ```
 src/
   app/
-    globals.css     Design tokens + Tailwind entry
-    layout.tsx      Root layout, fonts, metadata
-    page.tsx        Landing page composition
+    globals.css          Design tokens, keyframes, reduced-motion rules
+    layout.tsx           Root layout, fonts, metadata, skip link
+    page.tsx             Section composition
+    not-found.tsx        404
+    opengraph-image.tsx  Social card, generated at build
+  components/
+    layout/              Header: scroll shell, mobile menu
+    sections/            Hero, board, features, how it works, pricing, footer
+    ui/                  Button, Container, Section, Reveal, Logo
+  content/               All page copy as typed data
+  hooks/                 useReveal (IntersectionObserver)
+  lib/                   cn helper
 ```
-
-_This section grows as sections are built._
 
 ---
 
-## Notes
+## Accessibility
 
-Design and technical decisions are documented in
-[`DECISIONS.md`](DECISIONS.md) _(added before submission)_.
+- Every interactive element has a visible focus indicator meeting the 3:1
+  requirement for non-text contrast.
+- Skip link to `#main` as the first focusable element.
+- Mobile menu traps focus, closes on Escape, and returns focus to its trigger.
+- All colour pairings meet WCAG AA (see DECISIONS.md for the measurements).
+- Motion respects `prefers-reduced-motion`.
+- Content is fully visible with JavaScript disabled, including the signup form,
+  which uses a Server Action.
