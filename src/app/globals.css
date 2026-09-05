@@ -40,7 +40,30 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+  /* The header is fixed and 4rem tall — without this, anchored sections
+     (#features, #pricing) scroll to sit underneath it. */
+  scroll-padding-top: 5rem;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* Motion is opt-out, not opt-in. Covers every animation and transition on the
+   page, including ones added later, so this never needs revisiting. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
