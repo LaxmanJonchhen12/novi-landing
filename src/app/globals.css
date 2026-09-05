@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/*
+ * Novi design tokens (locked).
+ *
+ * Named to match shadcn/ui's convention (--background, --foreground,
+ * --accent, --border, --radius) even though shadcn isn't installed yet.
+ * When we add it later, `shadcn init` slots into these variables instead
+ * of overwriting them.
+ *
+ * No dark-mode variant on purpose: the brief specs one calm, light
+ * surface, not a theme that shifts with the OS.
+ */
+:root {
+  --background: #f8f8f5;
+  --foreground: #181a1b;
+  --muted-foreground: color-mix(in srgb, var(--foreground) 60%, transparent);
+
+  --accent: #2596be;
+  --accent-foreground: #f8f8f5;
+
+  --border: color-mix(in srgb, var(--foreground) 12%, transparent);
+
+  --radius: 0.75rem; /* rounded-xl, single source of truth */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-border: var(--border);
+
+  --radius-xl: var(--radius);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
