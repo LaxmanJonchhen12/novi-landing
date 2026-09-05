@@ -1,7 +1,11 @@
+import { BoardPreview } from "@/components/sections/board-preview";
+import { Hero } from "@/components/sections/hero";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 items-center justify-center">
-      <p className="text-muted-foreground">Novi — coming together.</p>
+    <main className="flex-1">
+      <Hero />
+      <BoardPreview />
     </main>
   );
 }

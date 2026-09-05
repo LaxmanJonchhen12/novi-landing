@@ -67,3 +67,16 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Hero entrance. `both` fill-mode holds the from-state before the delay
+   elapses, so staggered items don't flash in at full opacity first. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

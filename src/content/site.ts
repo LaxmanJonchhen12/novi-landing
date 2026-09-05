@@ -27,7 +27,6 @@ export const hero = {
   primaryCta: {
     label: "Start a board",
     href: "#",
-    note: "No card required",
   },
   secondaryCta: {
     label: "See how it works",
