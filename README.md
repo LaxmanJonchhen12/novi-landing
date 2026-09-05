@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Novi — Landing Page
 
-## Getting Started
+A landing page for **Novi**, a project and task management tool for small,
+fast-moving teams.
 
-First, run the development server:
+Built by [Laxman Jonchhen](https://github.com/LaxmanJonchhen12) as a frontend
+assessment.
+
+**Live preview:** _connecting deployment — link to follow_
+
+---
+
+## Quick start
+
+Requires **Node 20+** and **pnpm**.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+git clone https://github.com/LaxmanJonchhen12/novi-landing.git
+cd novi-landing
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Start the dev server |
+| `pnpm build` | Production build |
+| `pnpm start` | Serve the production build |
+| `pnpm lint` | Lint |
+| `pnpm exec tsc --noEmit` | Type-check |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Stack
 
-To learn more about Next.js, take a look at the following resources:
+| Choice | Why |
+|---|---|
+| **Next.js 16** (App Router) | Server Components by default — the static parts of a landing page ship no JavaScript. `"use client"` is used only on the interactive leaves. |
+| **TypeScript** | Page content is typed data rather than hardcoded JSX, so content and presentation stay separate. |
+| **Tailwind CSS v4** | CSS-first config. The design system lives in `globals.css` as CSS variables — one source of truth, no `tailwind.config.js` needed. |
+| **Geist** via `next/font` | Self-hosted at build time. No external font request, no layout shift on load. |
+| **CSS animations** (no animation library) | The page needs entrance choreography and scroll reveals, not physics or gestures. A ~34kB animation library would be the wrong trade; CSS keyframes plus a small `IntersectionObserver` hook ship zero extra JS. |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Design system
 
-## Deploy on Vercel
+Defined once in [`src/app/globals.css`](src/app/globals.css) and consumed
+everywhere through Tailwind utilities, so no component hardcodes a hex value.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Token | Value | Used for |
+|---|---|---|
+| `--background` | `#F8F8F5` | Page surface |
+| `--foreground` | `#181A1B` | Primary text |
+| `--muted-foreground` | `--foreground` @ 60% | Subheads, labels |
+| `--accent` | `#2596BE` | Primary action, emphasis |
+| `--border` | `--foreground` @ 12% | Thin 1px rules |
+| `--radius` | `0.75rem` | Corner radius throughout |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Variables use shadcn/ui's naming convention so the component library can be
+added later without rewriting the token layer.
+
+The visual direction is deliberately calm — generous whitespace, thin borders,
+a single accent, no gradients or heavy shadows. Novi's own pitch is a workspace
+that stays out of the way, and the page is meant to argue that by looking like
+it.
+
+**There is no dark mode, on purpose.** The brief specifies one calm surface;
+a theme that shifts with the OS would work against that.
+
+---
+
+## Responsiveness
+
+Verified at each step across the full range, not just at a mobile and a desktop
+breakpoint:
+
+`320px` · `390px` · `430px` · `768px` · `1024px` · `1440px` · `1920px` · `2560px`
+
+Type scales fluidly with `clamp()` rather than jumping at breakpoints, and
+content is width-capped so it stays readable on large monitors while the
+background remains full-bleed.
+
+---
+
+## Project structure
+
+```
+src/
+  app/
+    globals.css     Design tokens + Tailwind entry
+    layout.tsx      Root layout, fonts, metadata
+    page.tsx        Landing page composition
+```
+
+_This section grows as sections are built._
+
+---
+
+## Notes
+
+Design and technical decisions are documented in
+[`DECISIONS.md`](DECISIONS.md) _(added before submission)_.
