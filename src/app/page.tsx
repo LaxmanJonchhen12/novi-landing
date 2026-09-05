@@ -2,6 +2,7 @@ import { BoardPreview } from "@/components/sections/board-preview";
 import { Features } from "@/components/sections/features";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
+import { Pricing } from "@/components/sections/pricing";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <BoardPreview />
       <Features />
       <HowItWorks />
+      <Pricing />
     </main>
   );
 }

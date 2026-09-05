@@ -21,6 +21,5 @@ export const pricingTiers = [
     description:
       "Unlimited people, guest access for clients and contractors, and support from someone who works on the product.",
     cta: { label: "Start free trial", href: "#", note: "No card required" },
-    isFeatured: true,
   },
 ] as const satisfies readonly PricingTier[];

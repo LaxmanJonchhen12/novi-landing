@@ -82,6 +82,4 @@ export type PricingTier = {
   cadence?: string;
   description: string;
   cta: Cta;
-  /** Renders with accent emphasis. Exactly one tier should set this. */
-  isFeatured?: boolean;
 };
