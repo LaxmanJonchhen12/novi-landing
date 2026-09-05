@@ -8,6 +8,12 @@ import { cn } from "@/lib/utils";
  * Exported separately from the component so anchors can wear the same styling
  * without pretending to be buttons — CTAs on this page navigate, so they are
  * `<a>` elements with `buttonVariants()` applied.
+ *
+ * IMPORTANT: compose extra classes with `cn(buttonVariants({...}), "...")`,
+ * never `buttonVariants({ className: "..." })`. cva concatenates strings
+ * without resolving Tailwind conflicts, so a passed `hidden` loses to the
+ * base `inline-flex` on CSS source order — which silently left the desktop
+ * CTA visible on mobile. `cn` runs tailwind-merge and resolves it correctly.
  */
 export const buttonVariants = cva(
   [

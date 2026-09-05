@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { hero } from "@/content/site";
 import { buttonVariants } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { cn } from "@/lib/utils";
 
 /**
  * Server Component — the hero ships no JavaScript. The entrance animation is
@@ -42,11 +43,7 @@ export function Hero() {
 
           <a
             href={hero.secondaryCta.href}
-            className={buttonVariants({
-              variant: "ghost",
-              size: "lg",
-              className: "group",
-            })}
+            className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "group")}
           >
             {hero.secondaryCta.label}
             <ArrowRight

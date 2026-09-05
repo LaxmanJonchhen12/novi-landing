@@ -70,9 +70,15 @@ function Column({
   return (
     <div className="flex w-[85%] shrink-0 snap-start flex-col gap-3 md:w-auto">
       <div className="flex items-center gap-2 px-1">
-        <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        {/*
+          Deliberately not a heading. These label columns inside a mockup of
+          Novi's app — they aren't part of this page's document outline, and
+          making them headings both skipped a level (h1 -> h3) and told screen
+          readers the picture was page structure.
+        */}
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {column.name}
-        </h3>
+        </p>
         <span className="rounded-full bg-foreground/6 px-1.5 text-xs text-muted-foreground tabular-nums">
           {column.cards.length}
         </span>

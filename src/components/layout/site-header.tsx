@@ -1,5 +1,6 @@
 import { navCta, navLinks } from "@/content/site";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
 
@@ -39,7 +40,7 @@ export function SiteHeader() {
 
         <a
           href={navCta.href}
-          className={buttonVariants({ size: "sm", className: "hidden md:inline-flex" })}
+          className={cn(buttonVariants({ size: "sm" }), "hidden md:inline-flex")}
         >
           {navCta.label}
         </a>

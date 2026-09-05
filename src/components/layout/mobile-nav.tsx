@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { navCta, navLinks } from "@/content/site";
 import { buttonVariants } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
+import { cn } from "@/lib/utils";
 
 /**
  * Base UI's Dialog gives us focus trap, Escape-to-close, scroll lock and the
@@ -60,7 +61,7 @@ export function MobileNav() {
           <Dialog.Close
             render={<a href={navCta.href} />}
             nativeButton={false}
-            className={buttonVariants({ size: "lg", className: "mt-6 w-full" })}
+            className={cn(buttonVariants({ size: "lg" }), "mt-6 w-full")}
           >
             {navCta.label}
           </Dialog.Close>

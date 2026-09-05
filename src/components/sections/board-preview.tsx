@@ -9,7 +9,11 @@ import { Board } from "./board";
  */
 export function BoardPreview() {
   return (
-    <Container className="pb-20 sm:pb-24 lg:pb-32">
+    // No bottom padding on purpose. The board closes the hero unit, and the
+    // spacing to whatever follows is owned entirely by the next `Section`'s
+    // own py-12/py-24 rhythm. Paying for that gap in both places is what made
+    // it 221px at desktop.
+    <Container>
       <div className="animate-[rise_0.8s_ease-out_both] overflow-hidden rounded-xl border border-border bg-foreground/[0.02] [animation-delay:420ms]">
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
           <span aria-hidden className="flex gap-1.5">
