@@ -1,9 +1,14 @@
 import type { Feature } from "./types";
 
 export const featuresSection = {
-  heading: "Built for teams who'd rather ship.",
+  // Phase 2 (elevation pass): the original heading described the product in
+  // positive-only terms — never named what it's actually up against. This
+  // states the pain first ("second job" deliberately echoes the hero
+  // subhead's "second tool"), then the supporting line previews it in the
+  // same three concrete failure modes the four cards below individually fix.
+  heading: "Most tools become a second job.",
   supportingLine:
-    "No admin overhead, no dashboard to rebuild every Monday.",
+    "No admin overhead, no dashboard to rebuild every Monday, no decision buried in a thread the board never saw.",
 } as const;
 
 export const features = [
