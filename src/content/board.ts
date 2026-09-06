@@ -1,4 +1,4 @@
-import type { Board } from "./types";
+import type { Board, BoardCard } from "./types";
 
 /**
  * The demo sprint board shown in the hero.
@@ -62,3 +62,33 @@ export const board = {
     },
   ],
 } as const satisfies Board;
+
+/**
+ * Cards the board's motion (`Board`, client-side) pulls from as older work
+ * archives out of Done and new work needs to land in Idea. Kept as plain
+ * content, same as `board` itself — the component decides when to use them,
+ * this file just supplies what a believable next card looks like.
+ *
+ * Never `isActive`: a card only gets that once the motion promotes it into
+ * In progress.
+ */
+export const incomingCards: readonly BoardCard[] = [
+  {
+    id: "slack-thread-sync",
+    tag: { label: "Integration", tone: "violet" },
+    title: "Sync Slack threads to card comments",
+    assignee: { name: "Sam Park", initials: "SP", tone: "violet" },
+  },
+  {
+    id: "weekly-digest",
+    tag: { label: "Feature", tone: "green" },
+    title: "Send weekly progress digest email",
+    assignee: { name: "Jordan T.", initials: "JT", tone: "green" },
+  },
+  {
+    id: "invite-copy-fix",
+    tag: { label: "Engineering", tone: "amber" },
+    title: "Fix invite link copy on mobile",
+    assignee: { name: "Alex Rivera", initials: "AR", tone: "amber" },
+  },
+];
