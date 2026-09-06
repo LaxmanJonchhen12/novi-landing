@@ -16,6 +16,7 @@ export function Features() {
       id="features"
       heading={featuresSection.heading}
       supportingLine={featuresSection.supportingLine}
+      tinted
     >
       <Reveal className="mx-auto grid max-w-[64rem] gap-4 sm:grid-cols-2 sm:gap-5">
         {features.map((feature) => (
@@ -32,7 +33,10 @@ function FeatureCard({ feature }: { feature: Feature }) {
   return (
     // No hover lift here, unlike the board cards: these aren't links, and a
     // lift on a non-interactive card promises a click that never happens.
-    <div className="rounded-xl border border-border p-6 sm:p-7">
+    // bg-background is new for Phase 2: the section is now tinted, so cards
+    // need an explicit ground to read as panels sitting on it rather than
+    // blending into it.
+    <div className="rounded-xl border border-border bg-background p-6 sm:p-7">
       {/* Fixed height so all four cards line up in the 2x2 grid regardless
           of which visual's internal shape is drawn — see feature-icons.tsx. */}
       <div
