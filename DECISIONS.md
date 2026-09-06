@@ -1,3 +1,17 @@
+# Where this thesis actually came from
+
+I've worked in a few different setups, and none of them got it fully right.
+
+On one team, there was no process at all — no backlog grooming, no formal sprints, just developers and designers working in the same room. It worked in the moment, but there was no shared visibility into what was actually happening across the team.
+
+On another team, there was full process — backlog grooming, sprint planning, retro, the works. But that came with its own cost: we needed separate tools just to run planning poker and retros (Sprint retro planning needed a tool like Retrium), on top of whatever we used for the actual board. Backlog grooming itself often ended up as informal talk between engineering and QA rather than something that lived on the same platform as the work.
+
+I also did freelance work tracked entirely in docs. That was too loose to track properly, but going the other direction — creating and updating tickets under real time pressure — felt heavy for a fast-moving, one- or two-person job. And separately, when I've had to track multiple projects at once, needing separate analytics or separate views per project became its own kind of overhead.
+
+So the belief driving this isn't "process is bad" — it's that too much process becomes its own job, and too little process loses visibility. Novi's thesis is the middle: one place that gives a team the visibility that formal process is trying to protect, without needing a stack of separate tools (planning poker tool, retro tool, spreadsheet, docs) to get there.
+
+---
+
 # Design and technical decisions
 
 Notes on why this is built the way it is. Written for whoever reviews it —

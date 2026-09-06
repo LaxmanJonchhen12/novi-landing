@@ -61,7 +61,7 @@ CTA dialog, mobile menu), not a specific regression.
 | **TypeScript** | All page copy is typed data in `src/content/`, so content and presentation stay separate and a missing field fails the build. |
 | **Tailwind CSS v4** | CSS-first config. The design system lives in `globals.css` as CSS variables — one source of truth, no `tailwind.config.js`. |
 | **Base UI** | Used directly for the mobile menu and the CTA dialog (focus trap, Escape, scroll lock) — one shared dialog component, not four copies. See DECISIONS.md for why not shadcn/ui. |
-| **Geist** via `next/font` | Self-hosted at build. No external font request, no layout shift. |
+| **Geist** via `next/font` | Self-hosted at build, no external font request, no layout shift. Functionally close to Inter, but chosen specifically to avoid the extremely common Inter-on-every-SaaS-site look. |
 | **No animation library** | Entrance choreography and scroll reveals are CSS keyframes plus a ~30-line `IntersectionObserver` hook. The board's conveyor is a hand-rolled FLIP (~50 lines) over the Web Animations API — a card moving columns is a full unmount/remount in React, which needs a position-diff-and-tween, not a physics engine. A ~34kB library would have been the wrong trade either way. |
 
 ---
