@@ -1,8 +1,7 @@
 import { pricingSection, pricingTiers } from "@/content/pricing";
 import type { PricingTier } from "@/content/types";
-import { buttonVariants } from "@/components/ui/button";
+import { CtaButton } from "@/components/ui/cta-button";
 import { Section } from "@/components/ui/section";
-import { cn } from "@/lib/utils";
 
 /**
  * Both tiers get identical treatment on purpose. The section's own copy says
@@ -54,12 +53,7 @@ function PricingCard({ tier }: { tier: PricingTier }) {
           rendering it conditionally left that card's button sitting 24px
           higher than the other's. */}
       <div className="mt-auto pt-6">
-        <a
-          href={tier.cta.href}
-          className={cn(buttonVariants({ size: "md" }), "w-full")}
-        >
-          {tier.cta.label}
-        </a>
+        <CtaButton label={tier.cta.label} size="md" className="w-full" />
         <p className="mt-2 min-h-4 text-center text-xs text-muted-foreground">
           {tier.cta.note}
         </p>

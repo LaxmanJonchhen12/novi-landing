@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { SiteFooter } from "@/components/sections/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { CtaDialogProvider } from "@/components/cta-dialog";
 
 import "./globals.css";
 
@@ -73,9 +74,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
 
         <div id="top" />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <CtaDialogProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </CtaDialogProvider>
       </body>
     </html>
   );

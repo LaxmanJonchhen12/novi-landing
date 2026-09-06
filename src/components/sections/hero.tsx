@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 
 import { hero } from "@/content/site";
 import { buttonVariants } from "@/components/ui/button";
+import { CtaButton } from "@/components/ui/cta-button";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/utils";
 
@@ -37,9 +38,7 @@ export function Hero() {
         </p>
 
         <div className="mt-8 flex animate-[rise_0.7s_ease-out_both] flex-col items-stretch gap-3 [animation-delay:220ms] sm:flex-row sm:items-center sm:gap-4">
-          <a href={hero.primaryCta.href} className={buttonVariants({ size: "lg" })}>
-            {hero.primaryCta.label}
-          </a>
+          <CtaButton label={hero.primaryCta.label} size="lg" />
 
           <a
             href={hero.secondaryCta.href}

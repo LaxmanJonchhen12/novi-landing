@@ -1,6 +1,5 @@
 import { navCta, navLinks } from "@/content/site";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { CtaButton } from "@/components/ui/cta-button";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
 
@@ -38,12 +37,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <a
-          href={navCta.href}
-          className={cn(buttonVariants({ size: "sm" }), "hidden md:inline-flex")}
-        >
-          {navCta.label}
-        </a>
+        <CtaButton label={navCta.label} size="sm" className="hidden md:inline-flex" />
 
         <MobileNav />
       </Container>
