@@ -23,17 +23,23 @@ function cloneColumns(columns: readonly BoardColumn[]): BoardColumn[] {
  * One tick of the board's conveyor. Two steps, alternating forever:
  *
  * - "advance": the in-progress card finishes (moves to the front of Done,
- *   loses its active dot) and the front Idea card gets picked up (moves to
- *   the front of In progress, gains the dot) — both at once, since one
- *   finishing is what frees the team to start the next thing.
- * - "restock": the oldest Done card is archived off the board (cards are
- *   unshifted onto the front as they finish, so age increases toward the
- *   back of the array — the back is what leaves), and a fresh card arrives
- *   in Idea from the small `incomingCards` pool.
+ *   loses its active dot) and — in the SAME update — the oldest Done card is
+ *   archived off the board if that push would make Done taller than 2. The
+ *   front Idea card is picked up into In progress at the same time.
+ * - "restock": a fresh card arrives in Idea from the `incomingCards` pool,
+ *   bringing Idea back up to 2 (advance always removes exactly one from it).
  *
- * A full advance+restock cycle returns every column to its starting COUNT
- * (2 / 1 / 2) with different cards inside it — a conveyor, not a loop that
- * visibly reverses itself.
+ * Every column is capped at 2 cards, always, in EVERY rendered state — not
+ * just at rest. Column height (and so the board's height, and so everything
+ * below it on the page) can never move.
+ *
+ * This wasn't true before: archiving used to happen a whole step later than
+ * the finish that caused it, so Done legitimately held 3 cards for one full
+ * tick — 132px measured taller than at rest — which pushed Features and
+ * everything after it up and down every ~3.6s. If you were reading the page
+ * when a tick fired, the content under your cursor physically moved. Fixed
+ * by folding the archive into the same state update as the finish, so React
+ * never renders the 3-tall intermediate at all.
  *
  * Returns the id of any card pulled fresh from the pool, so the caller can
  * give it an entrance animation FLIP can't provide (a new card has no
@@ -57,6 +63,9 @@ function advanceBoard(
   if (step === "advance") {
     const finishing = inProgress.cards.shift();
     if (finishing) done.cards.unshift({ ...finishing, isActive: false });
+    // Archive here, not in "restock" — see the note above on why that one
+    // step's delay was the entire bug.
+    if (done.cards.length > 2) done.cards.pop();
 
     const starting = idea.cards.shift();
     if (starting) inProgress.cards.unshift({ ...starting, isActive: true });
@@ -64,9 +73,7 @@ function advanceBoard(
     return { columns: next, arrivedId: null };
   }
 
-  // "restock" — keep at least the original 2 as a floor so a tab left open
-  // a long time never empties the column out.
-  if (done.cards.length > 2) done.cards.pop();
+  // "restock" — no archiving here anymore, just the arrival.
   const arrival = pullIncoming();
   idea.cards.push(arrival);
   return { columns: next, arrivedId: arrival.id };
@@ -129,34 +136,26 @@ export function Board() {
     const container = containerRef.current;
     if (!container) return;
 
-    let isVisible = true;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = entry.isIntersecting;
-      },
-      { threshold: 0.1 },
-    );
-    io.observe(container);
+    // A recursive setTimeout, not setInterval — so the FIRST tick after the
+    // board becomes visible can use a short delay while every tick after
+    // uses the normal STEP_MS. `timeoutId === null` doubles as "nothing
+    // currently scheduled" (used by the IntersectionObserver below).
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    const pause = () => {
-      pausedRef.current = true;
-    };
-    const resume = () => {
-      pausedRef.current = false;
-    };
-    container.addEventListener("pointerenter", pause);
-    container.addEventListener("pointerleave", resume);
-    container.addEventListener("focusin", pause);
-    container.addEventListener("focusout", resume);
-
-    const interval = setInterval(async () => {
-      if (pausedRef.current || !isVisible || document.hidden) return;
+    const runTick = async () => {
+      if (pausedRef.current || document.hidden) {
+        // Don't drop the loop, just recheck soon — otherwise a pause that
+        // ends 1s into a 3.6s wait would sit idle for the rest of it.
+        timeoutId = setTimeout(runTick, 500);
+        return;
+      }
 
       const step = stepRef.current;
 
       // Fade the departing card out before it's actually removed from
-      // state, so it doesn't just vanish between frames.
-      if (step === "restock") {
+      // state, so it doesn't just vanish between frames. Archiving now
+      // happens on "advance" (see advanceBoard) — this has to match.
+      if (step === "advance") {
         const oldestDoneId = columnsRef.current.find((c) => c.id === "done")?.cards.at(-1)?.id;
         if (oldestDoneId) await fadeOut(oldestDoneId);
       }
@@ -173,15 +172,57 @@ export function Board() {
       setArrivedId(result.arrivedId);
       setColumns(result.columns);
       stepRef.current = step === "advance" ? "restock" : "advance";
-    }, STEP_MS);
+      timeoutId = setTimeout(runTick, STEP_MS);
+    };
+
+    // Scrolling the board into view reliably shows a move within ~1.5s —
+    // long enough to clear the entrance animation (last card finishes rising
+    // in at ~1.32s), short enough to read as "yes, this is alive," rather
+    // than landing at a random point in an already-running, invisible
+    // countdown (previously up to a full STEP_MS before anything happened).
+    // Scrolling away cancels the pending tick so scrolling back always gets
+    // the same fast first move, not a stale leftover wait.
+    const FIRST_TICK_MS = 1500;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (timeoutId === null) timeoutId = setTimeout(runTick, FIRST_TICK_MS);
+        } else if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+      },
+      { threshold: 0.1 },
+    );
+    io.observe(container);
+
+    // Mouse only — `pointerenter`/`pointerleave` also fire for touch taps,
+    // and a phone that never fires `pointerleave` (no hover concept) would
+    // pause the board forever on the first tap.
+    const pause = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") pausedRef.current = true;
+    };
+    const resume = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") pausedRef.current = false;
+    };
+    const focusPause = () => {
+      pausedRef.current = true;
+    };
+    const focusResume = () => {
+      pausedRef.current = false;
+    };
+    container.addEventListener("pointerenter", pause);
+    container.addEventListener("pointerleave", resume);
+    container.addEventListener("focusin", focusPause);
+    container.addEventListener("focusout", focusResume);
 
     return () => {
       io.disconnect();
-      clearInterval(interval);
+      if (timeoutId !== null) clearTimeout(timeoutId);
       container.removeEventListener("pointerenter", pause);
       container.removeEventListener("pointerleave", resume);
-      container.removeEventListener("focusin", pause);
-      container.removeEventListener("focusout", resume);
+      container.removeEventListener("focusin", focusPause);
+      container.removeEventListener("focusout", focusResume);
     };
   }, [fadeOut, recordPositions]);
 
@@ -302,7 +343,11 @@ function Card({
         {card.tag.label}
       </span>
 
-      <p className="mt-2.5 text-sm font-medium text-balance">{card.title}</p>
+      {/* min-h + line-clamp: two cards of the same column can carry titles
+          of very different lengths, and a swap between them shouldn't be
+          able to change the card's own height — same principle as the
+          column-count cap above, just at the text level. */}
+      <p className="mt-2.5 line-clamp-2 min-h-10 text-sm font-medium">{card.title}</p>
 
       <div className="mt-3 flex items-center gap-2">
         <span
