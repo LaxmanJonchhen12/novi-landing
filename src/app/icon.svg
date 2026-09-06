@@ -1,0 +1,10 @@
+<!-- Mirrors the mark in src/components/ui/logo.tsx (accent square, opacity
+     pattern [1, 0.7, 0.7, 1]) at 2x scale. A static file, not derived from
+     that component at build time — if the mark ever changes, update both. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="8" fill="#1e7b9c" />
+  <rect x="4" y="4" width="10" height="10" rx="3" fill="#f8f8f5" />
+  <rect x="18" y="4" width="10" height="10" rx="3" fill="#f8f8f5" fill-opacity="0.7" />
+  <rect x="4" y="18" width="10" height="10" rx="3" fill="#f8f8f5" fill-opacity="0.7" />
+  <rect x="18" y="18" width="10" height="10" rx="3" fill="#f8f8f5" />
+</svg>

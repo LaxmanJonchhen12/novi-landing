@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { SiteFooter } from "@/components/sections/site-footer";
@@ -52,6 +52,18 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   robots: { index: true, follow: true },
+};
+
+// Separate from `metadata` — this Next version moved `themeColor` (and other
+// viewport-affecting fields) out of Metadata into their own export. Putting
+// it back under `metadata` is a stale pattern from older Next docs/training
+// data and is silently ignored here, not just deprecated.
+export const viewport: Viewport = {
+  themeColor: "#1E7B9C",
+  // Declared explicitly rather than left to infer: "no dark mode" is a
+  // deliberate product decision (see CLAUDE.md), not an oversight, so the
+  // browser shouldn't try to dark-mode form controls or the scrollbar.
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
