@@ -37,14 +37,19 @@ Open <http://localhost:3000>.
 
 ## Lighthouse
 
-Measured against `pnpm build && pnpm start`, not the dev server.
+Measured against `pnpm build && pnpm start`, not the dev server. Re-measured
+after the Phase 2 elevation pass added the board's animation and the CTA
+dialog — see [DECISIONS.md](DECISIONS.md) for the honest before/after on why
+mobile Performance moved from 99.
 
 | | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
 | Desktop | **100** | **100** | **100** | **100** |
-| Mobile (throttled) | **99** | **100** | **100** | **100** |
+| Mobile (throttled) | **97** | **100** | **100** | **100** |
 
-Cumulative Layout Shift **0** and Total Blocking Time **0 ms** on both.
+Cumulative Layout Shift **0** on both. Total Blocking Time **0 ms** desktop,
+**10 ms** mobile — the baseline cost of the client components (board,
+CTA dialog, mobile menu), not a specific regression.
 
 ---
 
@@ -52,12 +57,12 @@ Cumulative Layout Shift **0** and Total Blocking Time **0 ms** on both.
 
 | Choice | Why |
 |---|---|
-| **Next.js 16** (App Router) | Server Components by default. Only four components ship JavaScript: the header's scroll observer, the mobile menu, the scroll-reveal wrapper, and the signup form. |
+| **Next.js 16** (App Router) | Server Components by default. Everything else on the page still ships zero JS — the client boundary is deliberately small: the header's scroll observer, the mobile menu, the scroll-reveal wrapper, the signup form, the board's motion, and the CTA dialog. |
 | **TypeScript** | All page copy is typed data in `src/content/`, so content and presentation stay separate and a missing field fails the build. |
 | **Tailwind CSS v4** | CSS-first config. The design system lives in `globals.css` as CSS variables — one source of truth, no `tailwind.config.js`. |
-| **Base UI** | Used directly for the mobile menu dialog (focus trap, Escape, scroll lock). See DECISIONS.md for why not shadcn/ui. |
+| **Base UI** | Used directly for the mobile menu and the CTA dialog (focus trap, Escape, scroll lock) — one shared dialog component, not four copies. See DECISIONS.md for why not shadcn/ui. |
 | **Geist** via `next/font` | Self-hosted at build. No external font request, no layout shift. |
-| **No animation library** | Entrance choreography and scroll reveals are CSS keyframes plus a ~30-line `IntersectionObserver` hook. A ~34kB library would have been the wrong trade. |
+| **No animation library** | Entrance choreography and scroll reveals are CSS keyframes plus a ~30-line `IntersectionObserver` hook. The board's conveyor is a hand-rolled FLIP (~50 lines) over the Web Animations API — a card moving columns is a full unmount/remount in React, which needs a position-diff-and-tween, not a physics engine. A ~34kB library would have been the wrong trade either way. |
 
 ---
 
@@ -106,18 +111,22 @@ desktop breakpoint:
 ```
 src/
   app/
-    globals.css          Design tokens, keyframes, reduced-motion rules
-    layout.tsx           Root layout, fonts, metadata, skip link
-    page.tsx             Section composition
-    not-found.tsx        404
-    opengraph-image.tsx  Social card, generated at build
+    globals.css           Design tokens, keyframes, reduced-motion rules
+    layout.tsx            Root layout, fonts, metadata, viewport, skip link
+    page.tsx              Section composition
+    not-found.tsx         404
+    opengraph-image.tsx   Social card, generated at build
+    icon.svg              Favicon, derived from the logo mark
+    apple-icon.tsx        Apple touch icon, generated at build
   components/
-    layout/              Header: scroll shell, mobile menu
-    sections/            Hero, board, features, how it works, pricing, footer
-    ui/                  Button, Container, Section, Reveal, Logo
-  content/               All page copy as typed data
-  hooks/                 useReveal (IntersectionObserver)
-  lib/                   cn helper
+    cta-dialog.tsx        Shared "concept product" dialog + its context
+    layout/               Header: scroll shell, mobile menu
+    sections/             Hero, board (+ FLIP motion), features (+ mini
+                          visuals), how it works (+ visuals), pricing, footer
+    ui/                   Button, CtaButton, Container, Section, Reveal, Logo
+  content/                All page copy as typed data
+  hooks/                  useReveal (IntersectionObserver), useFlip (board motion)
+  lib/                    cn helper
 ```
 
 ---
@@ -127,8 +136,11 @@ src/
 - Every interactive element has a visible focus indicator meeting the 3:1
   requirement for non-text contrast.
 - Skip link to `#main` as the first focusable element.
-- Mobile menu traps focus, closes on Escape, and returns focus to its trigger.
+- Mobile menu and the CTA dialog both trap focus, close on Escape, and return
+  focus to their trigger — verified with real keyboard events, not just markup.
 - All colour pairings meet WCAG AA (see DECISIONS.md for the measurements).
-- Motion respects `prefers-reduced-motion`.
+- Motion respects `prefers-reduced-motion`, including the board's animation
+  loop — it doesn't start at all rather than just running faster, since a
+  looping animation collapsed to a near-zero duration would be a strobe.
 - Content is fully visible with JavaScript disabled, including the signup form,
   which uses a Server Action.

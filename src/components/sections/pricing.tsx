@@ -1,3 +1,5 @@
+import { Check } from "lucide-react";
+
 import { pricingSection, pricingTiers } from "@/content/pricing";
 import type { PricingTier } from "@/content/types";
 import { CtaButton } from "@/components/ui/cta-button";
@@ -46,6 +48,24 @@ function PricingCard({ tier }: { tier: PricingTier }) {
       <p className="mt-4 text-sm/relaxed text-muted-foreground text-pretty">
         {tier.description}
       </p>
+
+      {/* A second, denser pass over the same claims above — not new
+          information, just scannable. Both tiers list exactly 4, keeping
+          the visual weight equal (the "neither tier is featured" decision
+          applies here too). */}
+      <ul className="mt-5 flex flex-col gap-2.5">
+        {tier.checks.map((check) => (
+          <li key={check} className="flex items-center gap-2.5 text-sm">
+            <span
+              aria-hidden
+              className="grid size-5 shrink-0 place-items-center rounded-full bg-accent/15 text-accent"
+            >
+              <Check className="size-3" strokeWidth={3} />
+            </span>
+            {check}
+          </li>
+        ))}
+      </ul>
 
       {/* mt-auto pins this block to the card's bottom so the CTAs line up
           despite the descriptions being different lengths. The note slot is

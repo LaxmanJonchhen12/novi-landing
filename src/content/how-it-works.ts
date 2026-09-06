@@ -16,15 +16,18 @@ export const howItWorksSteps = [
     title: "Bring your work in",
     description:
       "Import from Trello, Asana, Jira, or a spreadsheet. Your columns and assignees come across as they are — nothing to rebuild by hand.",
+    visual: "sources",
   },
   {
     title: "Plan the sprint in place",
     description:
       "Pull what matters into this week. Everything you didn't pick stays visible in the backlog instead of disappearing into a second tool.",
+    visual: "plan",
   },
   {
     title: "Ship, and keep the reasoning",
     description:
       "Close the sprint when it's done. The discussion that got you there stays attached to the tickets, not buried in a thread nobody can find.",
+    visual: "ship",
   },
 ] as const satisfies readonly HowItWorksStep[];

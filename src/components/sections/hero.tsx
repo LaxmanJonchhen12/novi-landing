@@ -17,10 +17,31 @@ import { cn } from "@/lib/utils";
  *
  * CTAs sit ABOVE the board deliberately: in the original prototype they were
  * below it, which pushed the primary action off-screen at 100% zoom.
+ *
+ * Phase 2 (elevation pass): the ground itself was flat — no imagery, nothing
+ * behind the type but `--background`. The dot-grid texture below is `radial-
+ * gradient`, technically covered by "no gradients," but that rule is aimed at
+ * the purple/indigo wash anti-slop pattern, not a neutral texture at 6% of
+ * `--foreground` — no new colour, no photo, no second accent. It fades out
+ * (`mask-image`) before reaching the board, so it reads as hero-only depth,
+ * not a page-wide pattern. Pure CSS, no client boundary — the hero still
+ * ships zero JavaScript.
  */
 export function Hero() {
   return (
-    <section className="pt-28 pb-16 sm:pt-36 sm:pb-20 lg:pt-44 lg:pb-24">
+    <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-20 lg:pt-44 lg:pb-24">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, color-mix(in srgb, var(--foreground) 14%, transparent) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+          maskImage: "linear-gradient(to bottom, black, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
+        }}
+      />
+
       <Container className="flex flex-col items-center text-center">
         <h1
           className="max-w-[18ch] animate-[rise_0.7s_ease-out_both] font-semibold tracking-[-0.03em] text-balance"

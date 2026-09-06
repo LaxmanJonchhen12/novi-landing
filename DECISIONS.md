@@ -39,7 +39,12 @@ state management or a library, and a half-working drag interaction reads worse
 than none. The motion demonstrates the claim; interactivity beyond that would
 have been scope for its own sake.
 
-The whole board is a Server Component — it ships zero JavaScript.
+The board started as a Server Component shipping zero JavaScript — a
+staggered one-time reveal on load, nothing more. That changed in the
+elevation pass below: the headline says "Work moves," and a board that never
+moves again after loading undercuts its own claim just as much as a static
+screenshot would. See "Phase 2" for what replaced it and the real bug that
+came with it.
 
 ---
 
@@ -155,6 +160,158 @@ property snap alignment actually consults.
 
 ---
 
+## Phase 2 — the elevation pass
+
+Steps 0–8 shipped a technically clean page: Lighthouse 100/100/100/100
+desktop, WCAG AA verified by measurement, zero dead nav links, twelve
+incremental commits. It was also forgettable. My own read and an independent
+review agreed: engineering ~9/10, landing page ~6.5/10. A cold visitor opens
+the deployed URL before the repo, and for the first thirty seconds the page
+read as clean, competent, and generic — every genuinely strong decision was
+sitting in code nobody skimming the site would ever see.
+
+The fix wasn't a redesign. The calm/minimal system stays; every rule in
+"Restraint as a position" above still holds. The brief was narrower: spend
+the two design levers the system already had and had never used
+(`--foreground` at low opacity as a full-bleed ground, and breaking the
+page's total symmetry once), make the headline's central claim literally
+true, and stop shipping dead buttons.
+
+### The board moves — and a real bug that came with making it move
+
+"Work moves." needed a board that does. Real drag-and-drop stayed out of
+scope for the same reason as Phase 1 — pointer-event state or a library, and
+a half-working drag reads worse than none — but the middle option between
+"static" and "@dnd-kit" had never been offered: a slow, deliberate conveyor.
+Every ~3.6s a card finishes and archives, or a fresh one arrives, cycling the
+board's own five cards forever without ever reversing itself.
+
+This is the one part of the page that had to become a Client Component, and
+the honest cost is real: `board.ts`'s content plus the conveyor logic now
+ship as JS, roughly 2KB gzipped. The animation itself is a hand-rolled FLIP
+(`useFlip`, ~50 lines) over the Web Animations API rather than a library — a
+card moving between columns is a full unmount/remount in React, which a CSS
+`transition` can't tween, but reading a card's before/after position and
+playing one `el.animate()` tween doesn't need Framer Motion either.
+
+**The bug, and how it was actually caught.** A user report (not a code
+review) was: reading the features section while the board animated above it,
+the page moved under the cursor. I measured it rather than guessing —
+sampling the board's rendered height over a full cycle in headless Chrome:
+
+```
+t=0.0s   board=312px  cols=[2,1,2]
+t=2.7s   board=444px  cols=[1,1,3]   ← +132px
+t=6.3s   board=312px  cols=[2,1,2]   ← back
+```
+
+The archive step (moving the oldest Done card off the board) ran a whole
+tick *after* the finish that caused Done to grow, so Done legitimately held
+three cards — and the page's own layout — for one full tick every cycle. The
+fix folds the archive into the same state update as the finish that requires
+it, so React never renders the three-tall intermediate at all. Re-measured
+after: `352px` flat across the entire cycle, 0px swing. Also capped every
+card title to two lines (`line-clamp-2` + `min-h-10`), since a swap between a
+one-line and two-line title is the same class of bug at a smaller scale.
+
+Two smaller fixes came out of the same pass: the conveyor used to run on a
+free-floating interval, so scrolling to the board could land anywhere in an
+invisible countdown before the first move — sometimes it looked static.
+It's now tied to an `IntersectionObserver` that restarts a short (1.5s)
+countdown every time the board actually enters view. And hover-pause was
+restricted to `pointerType === "mouse"`: a phone tap fires `pointerenter`
+without a matching `pointerleave`, which would have frozen the board for any
+touch visitor on the first tap.
+
+Respecting `prefers-reduced-motion` needed its own explicit check rather than
+the site's global CSS rule, which collapses `animation-duration` — that rule
+doesn't reach WAAPI, so a near-zero duration on a *looping* animation would
+have been a strobe, the opposite of the intent. The board simply never
+starts the loop under reduced motion. Verified by holding the page open 8s
+under the media query and diffing the DOM: byte-identical.
+
+### CTAs stopped being dead ends
+
+"Start free," "Start a board," and "Start free trial" were all `href="#"` —
+Interactions is a named grading criterion and the page shipped none beyond
+hover and scroll. The fix isn't a fake signup form that "succeeds" into
+nothing, which would be the same category of dishonesty the rest of the page
+avoids (no invented metrics, no fake testimonials): all three now open one
+shared dialog that says plainly this is a concept product built for an
+assessment, with a link to this repository. It's the one thing this page's
+actual audience — a reviewer — can use.
+
+The buttons are real `<button>`s now, not anchors to nowhere, which is also
+a correctness fix: `href="#"` was never right semantics for "open a dialog."
+State lives in a small shared context (`CtaDialogProvider`) rather than four
+copies of the same Dialog markup, which is what lets the mobile nav's own
+CTA close its menu and open this dialog in the same tap without two dialogs
+racing.
+
+### The visual system, extended, not reinvented
+
+The features section's four lucide icons were the most generic block on the
+page. They're now mini illustrations built from the board's own shapes and
+tones — a board fragment, a sprint timeline, a comment thread, a checklist —
+so that section stopped looking like it could belong to any SaaS product.
+The comment-thread visual does double duty: it's also the literal proof of
+the new pain-naming copy above it ("no decision buried in a thread the board
+never saw"), which is a stronger structure than three unrelated ideas.
+
+How-it-works and pricing got the same treatment at smaller scale rather than
+a new pattern: a slim, unboxed visual under each step (a card frame there
+would have quietly turned the section back into the card grid it's
+deliberately not), and a short check-row list under each pricing tier's
+existing description — both tiers get exactly four, keeping the "neither
+tier is featured" decision intact.
+
+### One section, one break in the rhythm
+
+Every section on the page was centered, on a flat ground, in the same
+rhythm. Features now sits on a full-bleed `bg-foreground/[0.02]` band — the
+same treatment the board's frame already used, just spent at section scale
+for the first time. Only this one section; the brief was explicit that the
+point is one change of rhythm, not a new pattern competing with the first.
+
+**A real visual bug in the first version of this.** The tint was on the
+outer `<section>` box, which is the same box that owns the gap between
+sections — so the color began flush against the board's own border above it,
+and ended flush against the last card's border below it. Screenshotted, both
+edges read as a collision, not a deliberate zone. Fixed by moving the tint to
+an inner wrapper with its own top/bottom padding, sitting *after* the
+section's normal (unchanged) top-padding gap — so the color has genuine
+breathing room on both sides, independent of the inter-section spacing rule.
+
+### A hero that isn't flat
+
+The hero was centred type on `--background` and nothing else. It now carries
+a faint dot-grid — `radial-gradient`, 14% `--foreground`, on a 24px grid,
+masked to fade out before the board. This is a defensible reading of "no
+gradients": that rule targets the purple/indigo hero-wash anti-slop pattern,
+not a neutral texture with no new colour and no photo. Pure CSS on the same
+Server Component the hero already was — no client boundary added for it.
+
+### Lighthouse, re-measured honestly
+
+The numbers in the README were from before any of the above — a page with
+zero client JS beyond the mobile menu and the signup form. Re-measured
+against `pnpm build && pnpm start` after Phase 2:
+
+| | Performance | Accessibility | Best Practices | SEO |
+|---|---|---|---|---|
+| Desktop | **100** | **100** | **100** | **100** |
+| Mobile (throttled) | **97** | **100** | **100** | **100** |
+
+CLS is still **0** on both — the layout-shift bug above was caught and fixed
+before it could show up here. Mobile Total Blocking Time moved from 0ms to
+**10ms**: real, small, and explained by "Reduce unused JavaScript" flagging
+~47KB in Next's own framework/hydration chunks, not application code — the
+baseline cost of having any client component at all, present since Phase 1's
+mobile menu and now shared by the board and the CTA dialog. I'd rather report
+a real 97 than leave a stale 99 in the README.
+
+---
+
 ## Known limitations
 
 Being explicit about these rather than leaving them to be discovered:
@@ -162,13 +319,19 @@ Being explicit about these rather than leaving them to be discovered:
 - **Footer links point to `#`.** Novi is fictional; there's no Careers page to
   link to. Nav links and hero CTAs all resolve to real sections — those are the
   ones a reviewer will click.
-- **No backend behind the signup.** The Server Action validates and responds;
-  connecting a real provider would be the only change.
-- **The board isn't draggable** — a deliberate scope decision, explained above.
+- **No backend behind the signup**, or behind the CTA dialog. The Server
+  Action validates and responds; the dialog says outright that this is a
+  concept product. Connecting a real provider, or a real signup flow, would
+  be the only change either way — neither pretends to be more than it is.
+- **The board isn't draggable** — a deliberate scope decision, explained
+  above. It does move on its own now (Phase 2); draggable interaction stays a
+  different, larger scope than a slow conveyor.
 - **No test suite.** For a static marketing page on this timeline I put the
-  effort into measured verification instead: Lighthouse, contrast maths, and
-  scripted keyboard/no-JS checks. A component test suite would be the first
-  thing I'd add if this grew.
+  effort into measured verification instead: Lighthouse, contrast maths,
+  scripted keyboard/no-JS checks, and — for the board's motion — sampling its
+  rendered height in headless Chrome across a full animation cycle rather
+  than eyeballing it. A component test suite would be the first thing I'd
+  add if this grew.
 
 ---
 
@@ -178,15 +341,23 @@ Veel's guidance was that AI could be used in moderation, so to be straight
 about how: I used Claude Code as a pair-programming tool throughout — for
 implementation speed, and for verification work like the WCAG contrast
 measurements, the scroll-snap diagnosis, and the scripted keyboard and no-JS
-testing above.
+testing above. Phase 2 leaned on the same verification habit for a harder
+problem: I reported the board's motion felt like it was shifting the page
+under me, and rather than guess at a fix, the actual board height was sampled
+in headless Chrome across a full cycle first — that's what turned "something
+feels off" into an exact 132px, and later confirmed the fix at exactly 0px.
+The tinted-section boundary bug the same way: I flagged the transition felt
+like a collision, a screenshot at the exact boundary confirmed it, and the
+fix was re-verified with another screenshot rather than taken on faith.
 
 The direction was mine. The headline and feature copy came out of my own
-research before any code existed, as did the locked design system. Where there
-was a real choice — dropping dark mode, not featuring a pricing tier, keeping
-the board choreographed rather than draggable, the layout of each section — I
-made the call and can explain the reasoning behind each one. Copy for the
-how-it-works and pricing sections was drafted with AI against my brief and
-edited by me.
+research before any code existed, as did the locked design system. Where
+there was a real choice — dropping dark mode, not featuring a pricing tier,
+keeping the board choreographed rather than draggable, the honest-dialog CTA
+over a fake signup, the layout of each section — I made the call and can
+explain the reasoning behind each one. Copy for the how-it-works and pricing
+sections, and the "second job" pain-naming line in Phase 2, was drafted with
+AI against my brief and edited by me.
 
 Every commit in this repository was reviewed and written by me, and I'm happy
 to walk through any line of it.

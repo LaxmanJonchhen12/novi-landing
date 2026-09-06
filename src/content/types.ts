@@ -18,6 +18,18 @@ export type Cta = Link & {
   note?: string;
 };
 
+/**
+ * Phase 2: "Start free" / "Start a board" / "Start free trial" stopped being
+ * links (see `CtaButton`) — they open the shared concept-product dialog
+ * instead, so they never had an `href` to read. Kept separate from `Cta`
+ * (still used by `hero.secondaryCta`, a real anchor) rather than leaving a
+ * `href: "#"` field on these that nothing reads.
+ */
+export type DialogCta = {
+  label: string;
+  note?: string;
+};
+
 /** Semantic icon slots, mapped to lucide components where features are rendered. */
 export type FeatureIcon = "board" | "sprints" | "threads" | "setup";
 
@@ -70,9 +82,13 @@ export type SocialLink = {
   icon: SocialIcon;
 };
 
+/** Semantic visual slots, mapped to mini illustrations where steps are rendered. */
+export type HowItWorksVisual = "sources" | "plan" | "ship";
+
 export type HowItWorksStep = {
   title: string;
   description: string;
+  visual: HowItWorksVisual;
 };
 
 export type PricingTier = {
@@ -81,5 +97,8 @@ export type PricingTier = {
   /** e.g. "per person / month" — omitted for free tiers. */
   cadence?: string;
   description: string;
-  cta: Cta;
+  /** Short scannable list under the description — not a replacement for it,
+   *  a second, denser pass over the same claims. */
+  checks: readonly string[];
+  cta: DialogCta;
 };

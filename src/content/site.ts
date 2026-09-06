@@ -1,4 +1,4 @@
-import type { Cta, Link } from "./types";
+import type { Cta, DialogCta, Link } from "./types";
 
 export const brand = {
   name: "Novi",
@@ -13,8 +13,7 @@ export const navLinks = [
 
 export const navCta = {
   label: "Start free",
-  href: "#",
-} as const satisfies Cta;
+} as const satisfies DialogCta;
 
 export const hero = {
   /** Split so the second line can carry the accent colour. */
@@ -24,14 +23,15 @@ export const hero = {
   },
   subhead:
     "One place to plan, track, and decide — without a second tool to keep it running.",
+  // Opens the shared concept-product dialog (see CtaButton) — no href to read.
   primaryCta: {
     label: "Start a board",
-    href: "#",
-  },
+  } satisfies DialogCta,
+  // A real anchor — this one still navigates.
   secondaryCta: {
     label: "See how it works",
     href: "#how-it-works",
-  },
+  } satisfies Cta,
   /**
    * A product fact, deliberately not social proof. An invented "trusted by
    * N teams" number would be the easiest thing on the page to disbelieve.
