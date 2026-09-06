@@ -59,11 +59,11 @@ export function CtaDialogProvider({ children }: { children: React.ReactNode }) {
                 href={REPO_URL}
                 target="_blank"
                 rel="noreferrer"
-                className={cn(buttonVariants({ size: "md" }), "flex-1")}
+                className={cn(buttonVariants({ size: "md" }), "flex-1 py-2 md:py-0")}
               >
                 View the code
               </a>
-              <Dialog.Close className={cn(buttonVariants({ variant: "outline", size: "md" }), "flex-1")}>
+              <Dialog.Close className={cn(buttonVariants({ variant: "outline", size: "md" }), "flex-1 py-2 md:py-0")}>
                 Close
               </Dialog.Close>
             </div>

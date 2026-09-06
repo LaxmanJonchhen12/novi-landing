@@ -20,7 +20,7 @@ export function CtaButton({ label, ...props }: CtaButtonProps) {
   const openDialog = useCtaDialog();
 
   return (
-    <Button onClick={openDialog} {...props}>
+    <Button onClick={openDialog} {...props} className="cursor-pointer">
       {label}
     </Button>
   );
